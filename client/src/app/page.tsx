@@ -1,0 +1,50 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+export default function Home() {
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-[#e0f7fa]">
+            <header className="flex items-center justify-between w-full max-w-4xl p-4">
+                <div className="text-3xl font-bold text-[#f39c12]">seruen</div>
+                {/*<Button className="px-4 py-2 text-white bg-[#f39c12] rounded-full">Sign In</Button>*/}
+            </header>
+            <main className="relative flex flex-col items-center justify-center flex-1 w-full    p-4 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('/almaty.png')` }}>
+                <h1 className="mb-8 text-2xl font-light text-center text-[#f39c12] z-10">Lets get to know each other</h1>
+                <div className="relative flex flex-col items-center w-full max-w-md z-10 space-y-4">
+                    <Input type="text" placeholder="Name" className="w-full px-4 py-2 text-lg text-black bg-white bg-opacity-75 border rounded-full" />
+                    <Input type="email" placeholder="Email" className="w-full px-4 py-2 text-lg text-black bg-white bg-opacity-75 border rounded-full" />
+                    <Input type="tel" placeholder="Phone Number" className="w-full px-4 py-2 text-lg text-black bg-white bg-opacity-75 border rounded-full" />
+                    <Input type="number" placeholder="Budget (in $)" className="w-full px-4 py-2 text-lg text-black bg-white bg-opacity-75 border rounded-full" />
+                    <textarea placeholder="Preferences" className="w-full px-4 py-2 text-lg text-black bg-white bg-opacity-75 border rounded-lg" rows={4}></textarea>
+                    <textarea placeholder="Available Days" className="w-full px-4 py-2 text-lg text-black bg-white bg-opacity-75 border rounded-lg" rows={4}></textarea>
+                </div>
+                <Button className="relative z-10 px-6 py-3 mt-6 text-white bg-[#8e44ad] rounded-full">
+                    Submit
+                </Button>
+            </main>
+            {/*<footer className="relative w-full max-w-4xl mt-8">*/}
+            {/*  <img src="/placeholder.svg" alt="Cityscape" className="w-full h-auto" />*/}
+            {/*</footer>*/}
+        </div>
+    );
+}
+
+function ArrowRightIcon(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+        </svg>
+    );
+}
