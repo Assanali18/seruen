@@ -161,4 +161,5 @@ function saveEventsToFile(events: Event[]) {
   console.log('Event data has been saved to events.json');
 }
 
+
 export { parseEvents };
