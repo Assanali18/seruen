@@ -32,7 +32,7 @@ Return the response as a valid JSON array.
 const events: Event[] = JSON.parse(fs.readFileSync('events.json', 'utf8'));
 console.log('Loaded events from events.json');
 
-const CHUNK_SIZE = 10; // Размер чанка для обработки
+const CHUNK_SIZE = 10; 
 
 const getEventChunks = (events: Event[], chunkSize: number): Event[][] => {
   const chunks: Event[][] = [];
@@ -77,7 +77,6 @@ export const getRecommendations = async (userPreferences: { profession?: string;
       let responseText = response.choices[0].message.content?.trim();
       console.log('Response:', responseText);
 
-      // Clean up response text
       responseText = responseText?.replace(/```json|```/g, '').trim() || '';
 
       const parsedResponse = JSON.parse(responseText);

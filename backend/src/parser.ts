@@ -21,14 +21,14 @@ async function parseEvents() {
   const twoWeeksLater = new Date();
   twoWeeksLater.setDate(today.getDate() + 14);
 
-  // Функция для проверки, проходит ли событие в ближайшие две недели
+
   const isWithinTwoWeeks = (dateText: string) => {
     const [day, month, year] = dateText.split('.').map(Number);
     const eventDate = new Date(year, month - 1, day);
     return eventDate >= today && eventDate <= twoWeeksLater;
   };
 
-  // парсим события из блока .impression-best .impression-card
+
   const bestEvents = await page.evaluate(() => {
     return Array.from(document.querySelectorAll('.impression-best .impression-card')).map(card => {
       const titleElement = card.querySelector('.impression-card-title');
@@ -88,7 +88,6 @@ async function parseEvents() {
 
   const eventDetails: Event[] = [];
 
-  // Парсим события из блока .impression-best .impression-card
   for (const event of bestEvents) {
     console.log('Opening event page at', event.link);
     try {
@@ -119,7 +118,6 @@ async function parseEvents() {
     }
   }
 
-  // Парсим оставшиеся события
   for (const url of events) {
     console.log('Opening event page at', url);
     try {

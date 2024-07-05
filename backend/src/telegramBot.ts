@@ -249,7 +249,7 @@ const completeTicketPurchase = async (url: string, confirmationCode: string) => 
   }
 };
 
-// Function to send recommendations every 6 hours
+
 const sendPeriodicRecommendations = async () => {
   for (const chatId in users) {
     sendNextEvent(chatId);
