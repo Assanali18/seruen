@@ -1,5 +1,8 @@
 export interface CreateUserDto {
-  username?: string;
+  userName: string;
   email: string;
-  password: string;
+  phone: string;
+  spendingLimit: number;
+  hobbies: string[];
+  schedule: string[];
 }

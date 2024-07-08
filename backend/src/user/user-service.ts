@@ -1,41 +1,35 @@
+import { getRecommendations } from '../recomendation';
 import { CreateUserDto } from './dtos/CreateUser.dto';
-import { User } from './types/response';
+import  User, { IUser }  from './models/User';
 
 // this user service instance shows how to create a user, get a user by id, and get all users with in-memory data
 class UserService {
-  usersInDatabase: User[] = [
-    {
-      id: 1,
-      email: 'albkfil@gmail.com',
-      username: 'alibackend',
-    },
-    {
-      id: 2,
-      email: 'bazarjackson@gmail.com',
-      username: 'bazarjackson',
-    },
-    {
-      id: 3,
-      email: 'samaltman@gmail.com',
-      username: 'openaiceo',
-    },
-  ];
+  async createUser(userDto: CreateUserDto) {
+    const { userName, email, phone, spendingLimit, schedule, hobbies } = userDto;
+    const newUser = new User({
+      userName,
+      email,
+      phone,
+      spendingLimit,
+      hobbies,
+      schedule
+    });
+    console.log('userName from form', userName);
+    
 
-  getUserById(id: number): User | null {
-    return this.usersInDatabase.find((user) => user.id === id) || null;
-  }
-  getUsers(): User[] {
-    return this.usersInDatabase;
-  }
+    await newUser.save();
 
-  createUser(userDto: CreateUserDto): User {
-    const newUser: User = {
-      id: 4,
-      email: userDto.email,
-      username: userDto.username || 'user',
-    };
-    this.usersInDatabase.push(newUser);
-    return newUser;
+    const welcomeMessage = `Привет, ${userName}! Добро пожаловать в Seruen. Мы будем присылать вам персонализированные рекомендации по мероприятиям.`;
+
+    
+    // bot.sendMessage(phone, welcomeMessage);
+    // const userPreferences = { profession: "unknown", salary: spendingLimit, schedule, hobbies, userName };
+    // const recommendations = await getRecommendations(userPreferences);
+
+
+
+
+
   }
 }
 

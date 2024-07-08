@@ -1,38 +1,14 @@
-import 'dotenv/config';
 import fs from 'fs';
 import { Event } from './types';
-import { OpenAI } from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import 'dotenv/config';
 
-const apiKey = process.env.OPENAI_API_KEY || '';
-if (!apiKey) {
-  throw new Error('API_KEY is not set');
-}
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
-});
-
-const systemPrompt = `
-You are an intelligent assistant specializing in recommending events based on user preferences. 
-Your task is to select the best events for the user from the given list of events, sorted by relevance. 
-Each event contains the title, date, description, time, venue, price in tenge, and ticket link. 
-The user preferences will include their profession, salary - price must not exceed more than 5,000 tenge, schedule, and hobbies. 
-You need to consider these preferences and match them with the provided events to return the most relevant events. 
-Additionally, analyze general trends and interests among similar people to enhance your recommendation. 
-Your response should include a list of creative, interesting, and engaging messages for each event, including the date, time, venue, and appropriate emojis related to the event.
-Each event message should follow this exact format and include relevant emojis:
-**Event Title**
-**Date:** event date
-**Time:** event time
-**Venue:** event venue
-**Price:** event price tenge
-Tickets are available at the link: [Buy a ticket](event ticket link)
-Return the response as a valid JSON array.
-`;
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { "responseMimeType": "application/json" } });
 
 const events: Event[] = JSON.parse(fs.readFileSync('events.json', 'utf8'));
-console.log('Loaded events from events.json');
 
-const CHUNK_SIZE = 10; 
+const CHUNK_SIZE = 10;
 
 const getEventChunks = (events: Event[], chunkSize: number): Event[][] => {
   const chunks: Event[][] = [];
@@ -42,50 +18,47 @@ const getEventChunks = (events: Event[], chunkSize: number): Event[][] => {
   return chunks;
 };
 
-export const getRecommendations = async (userPreferences: { profession?: string; salary?: number; schedule?: string[]; hobbies?: string[]; userName?: string; }): Promise<string[]> => {
+export const getRecommendations = async (userPreferences: { salary?: number; hobbies?: string[]; userName?: string; }): Promise<{ venue: string; ticketLink: string; message: string; }[]> => {
   const eventChunks = getEventChunks(events, CHUNK_SIZE);
 
-  const recommendations: string[] = [];
+  const recommendations: { venue: string; ticketLink: string; message: string; }[] = [];
 
   for (const chunk of eventChunks) {
     const userPrompt = `
-      I am a ${userPreferences.profession} with a salary of ${userPreferences.salary}. 
-      My schedule is ${JSON.stringify(userPreferences.schedule)} and my hobbies are ${JSON.stringify(userPreferences.hobbies)}.
+      My budget is ${userPreferences.salary}
+      my hobbies are ${JSON.stringify(userPreferences.hobbies)}.
       Here are some events: ${JSON.stringify(chunk)}
-      Please recommend the most relevant events in a list of creative, interesting, and engaging messages with all necessary details, including the date, time, venue, and appropriate emojis related to the event. Use the user's name **${userPreferences.userName}** in the message explaining why they should attend each event.
-      Each event message should follow this exact format and include relevant emojis:
-      **Event Title**
-      **Date:** event date
-      **Time:** event time
-      **Venue:** event venue
-      **Price:** event price tenge
-      Tickets are available at the link: event ticket link
-      Return the response as a valid JSON array.
+      Please recommend the most relevant events, sorted by relevance, in a list of creative, interesting, and engaging messages with all necessary details, including the date, time, venue, and appropriate emojis related to the event.
+      Use the user's name **${userPreferences.userName}** in the message explaining why they should attend each event. Respond as a professional SMM specialist.
+      Be sure that the price of the event was not more expensive than the user's budget by 3000 tenge.
+      Avoid repeating events in the recommendations.
+      Do not invent new events, only use the events provided.
+      Discard any events that do not fit the user's preferences based on the provided criteria.
+      Return the response as a valid JSON array of objects, each with keys "venue", "ticketLink", and "message" containing the formatted event details.
+      
+      Example:
+      [
+        {
+          "venue": "Almaty Arena, мкр. Нуркент, 7",
+          "ticketLink": "https://sxodim.com/almaty/kontserty/solnyy-koncert-jony/tickets",
+          "message": "🔥 Готовы погрузиться в мир эмоций и драйва? 🔥\n\nСольный концерт JONY уже совсем скоро! 🎉\n\n🗓️ 22.09.2024\n💰 20000 тг\n**⏰ 20:00\n📍 Almaty Arena, мкр. Нуркент, 7\n\n🎤 JONY исполнит свои самые популярные хиты, заставит вас петь и танцевать всю ночь напролет!\n\n🎫 Билеты уже в продаже: "https://sxodim.com/almaty/kontserty/solnyy-koncert-jony/tickets" \n\nНе пропустите это незабываемое событие! 💥"
+        }
+      ]
     `;
 
     console.log('Sending message for chunk...');
 
     try {
-      const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-      });
-
-      let responseText = response.choices[0].message.content?.trim();
+      const response = await model.generateContent(userPrompt);
+      const responseText = await response.response.text();
       console.log('Response:', responseText);
 
-      responseText = responseText?.replace(/```json|```/g, '').trim() || '';
-
       const parsedResponse = JSON.parse(responseText);
-      recommendations.push(...parsedResponse.map((event: any) => event.message));
+      recommendations.push(...parsedResponse);
     } catch (error) {
       console.error('Error during communication or parsing:', error);
       continue;
     }
   }
-
-  return recommendations; 
+  return recommendations;
 };

@@ -20,29 +20,7 @@ class UserController {
     }
   };
 
-  getUsers = (req: Request, res: Response) => {
-    try {
-      const users = this.userService.getUsers();
-      res.status(200).json(users);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  };
 
-  getUserById = (req: Request, res: Response) => {
-    try {
-      const params = req.params;
-      const id = parseInt(params.id);
-      const user = this.userService.getUserById(id);
-      if (!user) {
-        res.status(404).json({ error: 'User not found' });
-      } else {
-        res.status(200).json(user);
-      }
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  };
 }
 
 export default UserController;
