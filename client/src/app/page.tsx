@@ -92,7 +92,7 @@ export default function Home() {
                 <div className="hidden sm:block font-semibold text-white text-4xl sm:pr-[350px]">seruen</div>
                 <img src="/profile.svg" alt="profile" className="w-8 h-8" />
             </header>
-            <main className="flex flex-col items-center flex-1 w-full pt-20 sm:pt-[100px] px-4">
+            <main className="flex flex-col items-center flex-1 w-full pt-24 sm:pt-[100px] px-4">
                 <h1 className="w-full sm:w-[60%] text-2xl sm:text-4xl font-black text-center text-[#E79A86] mb-4">Узнайте о лучших событиях в вашем городе!</h1>
                 <h2 className="w-full sm:w-[60%] text-base sm:text-2xl font-medium text-center text-[#9A9A9A] pb-7">Введите свои данные, чтобы получать персонализированные рекомендации и не пропустить ни одного интересного мероприятия.</h2>
                 <form className="w-full sm:w-[60%] space-y-4" onSubmit={handleSubmit}>
