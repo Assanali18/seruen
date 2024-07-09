@@ -31,7 +31,7 @@ export default function Home() {
     };
 
     const handleSubmit = async (e: any) => {
-        // e.preventDefault();
+        e.preventDefault();
 
         if (!name || !budget || preferences.length === 0) {
             toast.error('Пожалуйста заполните все поля');
@@ -56,6 +56,7 @@ export default function Home() {
             const response = await axiosInstance.post('/api/users/', userPreferences);
 
             if (response.status === 201) {
+                toast.success('test5')
                 if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
                     window.location.assign('tg://resolve?domain=EventEaseBot');
                 } else {
