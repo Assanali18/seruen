@@ -165,7 +165,7 @@ export default function Home() {
                             {showDropdown && (
                                 <div
                                     ref={dropdownRef}
-                                    className={`absolute w-full bg-white shadow-lg rounded-lg z-10 ${window.innerWidth < 640 ? 'bottom-full mb-2' : 'top-full mt-2'}`}
+                                    className={`absolute w-full bg-white shadow-lg rounded-lg z-10 top-full mt-2'}`}
                                 >
                                     <div className="flex flex-wrap gap-2 p-2">
                                         {allPreferences.map(preference => (
