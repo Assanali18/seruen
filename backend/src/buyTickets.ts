@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const WebSocket = require('ws');
+// const WebSocket = require('ws');
 
 async function buyTickets(ticketUrl, chatId, bot) {
     const browser = await puppeteer.launch({ headless: false });
@@ -29,28 +29,28 @@ async function buyTickets(ticketUrl, chatId, bot) {
 
     await bot.sendMessage(chatId, 'Введите код, отправленный на ваш телефон:');
 
-    const userCode = await waitForUserInput(chatId);
+    // const userCode = await waitForUserInput(chatId);
 
-    await page.waitForSelector('input[name="code"]', { visible: true });
-    await page.type('input[name="code"]', userCode);
-    await page.click('.auth-popup-validate-button');
+    // await page.waitForSelector('input[name="code"]', { visible: true });
+    // await page.type('input[name="code"]', userCode);
+    // await page.click('.auth-popup-validate-button');
 
     await browser.close();
 }
 
-async function waitForUserInput(chatId) {
-    return new Promise((resolve, reject) => {
-        const ws = new WebSocket(`ws://localhost:8080?chatId=${chatId}`);
+// async function waitForUserInput(chatId) {
+//     return new Promise((resolve, reject) => {
+//         const ws = new WebSocket(`ws://localhost:8080?chatId=${chatId}`);
 
-        ws.on('message', (message) => {
-            resolve(message);
-            ws.close();
-        });
+//         ws.on('message', (message) => {
+//             resolve(message);
+//             ws.close();
+//         });
 
-        ws.on('error', (error) => {
-            reject(error);
-        });
-    });
-}
+//         ws.on('error', (error) => {
+//             reject(error);
+//         });
+//     });
+// }
 
-module.exports = buyTickets;
+export default buyTickets;

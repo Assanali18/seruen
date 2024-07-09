@@ -3,6 +3,7 @@ import { getRecommendations } from './recomendation';
 import User from './user/models/User';
 import 'dotenv/config';
 import buyTickets from './buyTickets';
+import { assert } from 'console';
 
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN || '';
 if (!TELEGRAM_TOKEN) {

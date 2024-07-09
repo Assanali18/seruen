@@ -18,6 +18,9 @@ class UserService {
     
 
     await newUser.save();
+    console.log('newUser', newUser);
+    
+    return newUser;
 
     const welcomeMessage = `Привет, ${userName}! Добро пожаловать в Seruen. Мы будем присылать вам персонализированные рекомендации по мероприятиям.`;
 
