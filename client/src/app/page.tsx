@@ -31,7 +31,9 @@ export default function Home() {
     };
 
     const handleSubmit = async (e: any) => {
+        toast.success('тест')
         e.preventDefault();
+
 
         if (!name || !budget || preferences.length === 0) {
             toast.error('Пожалуйста заполните все поля');
