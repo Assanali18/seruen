@@ -83,41 +83,42 @@ export default function Home() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-[#e0f7fa] bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('/bg-almaty.png')` }}>
-            <header className="flex items-center justify-end h-14 w-[60%] rounded-[30px] mt-6 p-4 bg-[#C5DF93]">
-                <div className="font-semibold text-white text-4xl pr-[350px]">seruen</div>
+            <header className="flex items-center justify-between w-full p-4 bg-[#C5DF93] fixed top-0 z-10 sm:static sm:justify-end sm:w-[60%] sm:rounded-[30px] sm:mt-6 sm:p-4">
+                <div className="text-white text-lg sm:hidden">seruen</div>
+                <div className="hidden sm:block font-semibold text-white text-4xl sm:pr-[350px]">seruen</div>
                 <img src="/profile.svg" alt="profile" className="w-8 h-8" />
             </header>
-            <main className="flex flex-col items-center flex-1 w-full pt-[100px]">
-                <h1 className="w-[60%] text-4xl font-black text-center text-[#E79A86] mb-4">Узнайте о лучших событиях в вашем городе!</h1>
-                <h2 className="w-[60%] text-2xl font-medium text-center text-[#9A9A9A] pb-7">Введите свои данные, чтобы получать персонализированные рекомендации и не пропустить ни одного интересного мероприятия.</h2>
-                <form className="w-[60%] space-y-4" onSubmit={handleSubmit}>
+            <main className="flex flex-col items-center flex-1 w-full pt-20 sm:pt-[100px] px-4">
+                <h1 className="w-full sm:w-[60%] text-2xl sm:text-4xl font-black text-center text-[#E79A86] mb-4">Узнайте о лучших событиях в вашем городе!</h1>
+                <h2 className="w-full sm:w-[60%] text-base sm:text-2xl font-medium text-center text-[#9A9A9A] pb-7">Введите свои данные, чтобы получать персонализированные рекомендации и не пропустить ни одного интересного мероприятия.</h2>
+                <form className="w-full sm:w-[60%] space-y-4" onSubmit={handleSubmit}>
                     {currentStep === 0 && (
-                        <div className="w-full flex flex-col space-y-1">
-                            <label className="block text-sm text-[#9A9A9A] text-opacity-80">Введите свой юзернейм в телеграме</label>
-                            <div className="flex gap-2">
+                        <div className="w-full flex flex-col space-y-2">
+                            <label className="block text-sm sm:text-md text-[#9A9A9A] text-opacity-80">Введите свой юзернейм в телеграме</label>
+                            <div className="flex flex-col sm:flex-row gap-2">
                                 <Input
                                     type="text"
                                     placeholder="@username"
-                                    className="flex-1 h-16 text-lg text-black bg-white bg-opacity-75 rounded-full border-[#C5DF93] border-2 focus:border-[#9A9A9A] focus:border-3 focus:outline-none"
+                                    className="flex-1 h-12 sm:h-16 text-sm sm:text-lg text-black bg-white bg-opacity-75 rounded-full border-[#C5DF93] border-2 focus:border-[#9A9A9A] focus:border-3 focus:outline-none"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                 />
                                 <button
                                     type="button"
                                     onClick={handleNext}
-                                    className="h-16 px-6 flex justify-center text-white bg-[#C5DF93] rounded-full"
+                                    className="h-12 sm:h-16 w-full sm:w-auto bg-[#C5DF93] text-white rounded-lg mt-2 sm:mt-0 sm:px-6 flex justify-center items-center"
                                 >
-                                    <img src="/arrow.svg" alt="next" className="w-[50px] h-[60px]" />
+                                    <img src="/arrow.svg" alt="next" className="w-6 sm:w-[50px] h-6 sm:h-[60px]" />
                                 </button>
                             </div>
                         </div>
                     )}
                     {currentStep === 1 && (
-                        <div className="w-full flex flex-col space-y-4">
-                            <label className="block text-md text-[#9A9A9A]">Введите бюджет (в тенге) который Вы готовы потратить на свой досуг</label>
-                            <div className="flex gap-2">
+                        <div className="w-full flex flex-col space-y-2">
+                            <label className="block text-sm sm:text-md text-[#9A9A9A]">Введите бюджет (в тенге) который Вы готовы потратить на свой досуг</label>
+                            <div className="flex flex-col sm:flex-row gap-2">
                                 <select
-                                    className="flex-1 h-16 text-lg text-black bg-white bg-opacity-75 rounded-full border-[#C5DF93] border-2 focus:border-[#9A9A9A] focus:border-3 focus:outline-none"
+                                    className="flex-1 h-12 sm:h-16 text-sm sm:text-lg text-black bg-white bg-opacity-75 rounded-full border-[#C5DF93] border-2 focus:border-[#9A9A9A] focus:border-3 focus:outline-none"
                                     value={budget}
                                     onChange={(e) => setBudget(e.target.value)}
                                 >
@@ -131,35 +132,37 @@ export default function Home() {
                                 <button
                                     type="button"
                                     onClick={handleNext}
-                                    className="h-16 px-6 flex justify-center text-white bg-[#C5DF93] rounded-full"
+                                    className="h-12 sm:h-16 w-full sm:w-auto bg-[#C5DF93] text-white rounded-lg mt-2 sm:mt-0 sm:px-6 flex justify-center items-center"
                                 >
-                                    <img src="/arrow.svg" alt="next" className="w-[50px] h-[70px]" />
+                                    <img src="/arrow.svg" alt="next" className="w-6 sm:w-[50px] h-6 sm:h-[70px]" />
                                 </button>
                             </div>
-
                         </div>
                     )}
                     {currentStep === 2 && (
-                        <div className="w-full flex flex-col space-y-4 relative">
-                            <label className="block text-md text-[#9A9A9A]">Какие у Вас предпочтения?</label>
-                            <div className="flex">
+                        <div className="w-full flex flex-col space-y-2 relative">
+                            <label className="block text-sm sm:text-md text-[#9A9A9A]">Какие у Вас предпочтения?</label>
+                            <div className="flex flex-col sm:flex-row gap-2">
                                 <Input
                                     type="text"
                                     placeholder="Выберите предпочтения"
-                                    className="w-full h-16 text-lg text-black bg-white bg-opacity-75 rounded-full border-[#C5DF93] border-2 focus:border-[#9A9A9A] focus:border-3 focus:outline-none"
+                                    className="h-12 sm:h-16 text-sm sm:text-lg text-black bg-white bg-opacity-75 rounded-full border-[#C5DF93] border-2 focus:border-[#9A9A9A] focus:border-3 focus:outline-none"
                                     value={preferences.join(', ')}
                                     readOnly
                                     onClick={() => setShowDropdown(!showDropdown)}
                                 />
                                 <button
                                     type="submit"
-                                    className="h-16 px-6 flex justify-center text-white bg-[#C5DF93] rounded-full"
+                                    className="h-12 sm:h-16 w-full sm:w-auto bg-[#C5DF93] text-white rounded-lg mt-2 sm:mt-0 sm:px-6 flex justify-center items-center"
                                 >
-                                    <img src="/arrow.svg" alt="next" className="w-[50px] h-[70px]" />
+                                    <img src="/arrow.svg" alt="next" className="w-6 sm:w-[50px] h-6 sm:h-[70px]" />
                                 </button>
                             </div>
                             {showDropdown && (
-                                <div ref={dropdownRef} className="absolute mt-2 w-full bg-white shadow-lg rounded-lg z-10" style={{ top: '100%' }}>
+                                <div
+                                    ref={dropdownRef}
+                                    className={`absolute w-full bg-white shadow-lg rounded-lg z-10 ${window.innerWidth < 640 ? 'bottom-full mb-2' : 'top-full mt-2'}`}
+                                >
                                     <div className="flex flex-wrap gap-2 p-2">
                                         {allPreferences.map(preference => (
                                             <div
