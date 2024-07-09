@@ -59,11 +59,13 @@ export default function Home() {
                 toast.success('test5')
                 if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
                     window.location.assign('tg://resolve?domain=EventEaseBot');
+                    toast.success('test7')
                 } else {
                     window.location.assign('https://t.me/EventEaseBot');
                 }
                 toast.success('Спасибо за регистрацию! Пожалуйста, напишите боту в телеграме');
             } else {
+                toast.success('test6')
                 console.error('Error fetching recommendations:', response.statusText);
             }
         } catch (error) {
