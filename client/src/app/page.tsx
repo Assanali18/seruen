@@ -31,14 +31,14 @@ export default function Home() {
     };
 
     const handleSubmit = async (e: any) => {
-        toast.success('тест')
-        e.preventDefault();
-
+        // e.preventDefault();
 
         if (!name || !budget || preferences.length === 0) {
             toast.error('Пожалуйста заполните все поля');
             return;
         }
+
+        toast.success('test1')
 
         const userPreferences: UserPreferencesDTO = {
             userName: name,
@@ -48,9 +48,11 @@ export default function Home() {
             hobbies: preferences,
             schedule: availableDays.split(',').map(day => day.trim())
         };
+        toast.success('test2')
 
         try {
             console.log('userPreferences:', userPreferences)
+            toast.success('test3')
             const response = await axiosInstance.post('/api/users/', userPreferences);
 
             if (response.status === 201) {
@@ -66,6 +68,7 @@ export default function Home() {
         } catch (error) {
             console.error('Error:', error);
         }
+        toast.success('test4')
     };
 
     const handlePreferencesChange = (preference: string) => {
@@ -161,6 +164,7 @@ export default function Home() {
                                 />
                                 <button
                                     type="submit"
+                                    onClick={handleSubmit}
                                     className="h-12 sm:h-16 w-full sm:w-auto bg-[#C5DF93] text-white rounded-lg mt-2 sm:mt-0 sm:px-6 flex justify-center items-center"
                                 >
                                     <img src="/arrow.svg" alt="next" className="w-6 sm:w-[50px] h-6 sm:h-[70px]" />
@@ -169,7 +173,7 @@ export default function Home() {
                             {showDropdown && (
                                 <div
                                     ref={dropdownRef}
-                                    className={`absolute w-full bg-white shadow-lg rounded-lg z-10 ${window.innerWidth < 640 ? 'bottom-full mb-2' : 'top-full mt-2'}`}
+                                    className={`absolute w-full bg-white shadow-lg rounded-lg z-10 top-full mt-2'}`}
                                 >
                                     <div className="flex flex-wrap gap-2 p-2">
                                         {allPreferences.map(preference => (
