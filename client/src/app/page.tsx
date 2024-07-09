@@ -38,8 +38,6 @@ export default function Home() {
             return;
         }
 
-        toast.success('test1')
-
         const userPreferences: UserPreferencesDTO = {
             userName: name,
             email,
@@ -48,33 +46,26 @@ export default function Home() {
             hobbies: preferences,
             schedule: availableDays.split(',').map(day => day.trim())
         };
-        toast.success('test2')
 
         try {
             console.log('userPreferences:', userPreferences)
-            toast.success('test3')
             const response = await axiosInstance.post('/api/users/', userPreferences);
-            console.log('response:', response);
 
             if (response.status === 201) {
-                toast.success('test5')
                 if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
                     window.location.assign('tg://resolve?domain=EventEaseBot');
-                    toast.success('test7')
                 } else {
                     window.location.assign('https://t.me/EventEaseBot');
                 }
                 toast.success('Спасибо за регистрацию! Пожалуйста, напишите боту в телеграме');
             } else {
-                toast.success('test6')
                 console.error('Error fetching recommendations:', response.statusText);
                 toast.error(`Error: ${response.statusText}`);
             }
         } catch (error:any) {
-            console.error('Error:', error);
-            toast.error(`Error: ${error.message}`);
+            console.error('Network Error:', error);
+            toast.error(`Network Error: ${error.message}`);
         }
-        toast.success('test4')
     };
 
     const handlePreferencesChange = (preference: string) => {
