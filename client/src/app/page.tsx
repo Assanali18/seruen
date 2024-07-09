@@ -48,6 +48,7 @@ export default function Home() {
         };
 
         try {
+            console.log('userPreferences:', userPreferences)
             const response = await axiosInstance.post('/api/users/', userPreferences);
 
             if (response.status === 201) {
@@ -157,6 +158,7 @@ export default function Home() {
                                 />
                                 <button
                                     type="submit"
+                                    onClick={handleSubmit}
                                     className="h-12 sm:h-16 w-full sm:w-auto bg-[#C5DF93] text-white rounded-lg mt-2 sm:mt-0 sm:px-6 flex justify-center items-center"
                                 >
                                     <img src="/arrow.svg" alt="next" className="w-6 sm:w-[50px] h-6 sm:h-[70px]" />
