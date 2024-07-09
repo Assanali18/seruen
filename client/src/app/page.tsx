@@ -51,7 +51,7 @@ export default function Home() {
             const response = await axiosInstance.post('/api/users/', userPreferences);
 
             if (response.status === 201) {
-                window.location.href = 'https://t.me/EventEaseBot';
+                window.location.assign('https://t.me/EventEaseBot');
             } else {
                 console.error('Error fetching recommendations:', response.statusText);
             }
