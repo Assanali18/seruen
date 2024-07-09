@@ -54,6 +54,7 @@ export default function Home() {
             console.log('userPreferences:', userPreferences)
             toast.success('test3')
             const response = await axiosInstance.post('/api/users/', userPreferences);
+            console.log('response:', response);
 
             if (response.status === 201) {
                 toast.success('test5')
@@ -67,9 +68,11 @@ export default function Home() {
             } else {
                 toast.success('test6')
                 console.error('Error fetching recommendations:', response.statusText);
+                toast.error(`Error: ${response.statusText}`);
             }
-        } catch (error) {
+        } catch (error:any) {
             console.error('Error:', error);
+            toast.error(`Error: ${error.message}`);
         }
         toast.success('test4')
     };
@@ -167,7 +170,6 @@ export default function Home() {
                                 />
                                 <button
                                     type="submit"
-                                    onClick={handleSubmit}
                                     className="h-12 sm:h-16 w-full sm:w-auto bg-[#C5DF93] text-white rounded-lg mt-2 sm:mt-0 sm:px-6 flex justify-center items-center"
                                 >
                                     <img src="/arrow.svg" alt="next" className="w-6 sm:w-[50px] h-6 sm:h-[70px]" />
@@ -176,7 +178,7 @@ export default function Home() {
                             {showDropdown && (
                                 <div
                                     ref={dropdownRef}
-                                    className={`absolute w-full bg-white shadow-lg rounded-lg z-10 top-full mt-2'}`}
+                                    className={`absolute w-full bg-white shadow-lg rounded-lg z-10 ${window.innerWidth < 640 ? 'bottom-full mb-2' : 'top-full mt-2'}`}
                                 >
                                     <div className="flex flex-wrap gap-2 p-2">
                                         {allPreferences.map(preference => (
