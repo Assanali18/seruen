@@ -50,7 +50,7 @@ export default function Home() {
         try {
             console.log('userPreferences:', userPreferences)
             const response = await axiosInstance.post('/api/users/', userPreferences);
-            toast.success('отправляем запрос')
+
             if (response.status === 201) {
                 if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
                     window.location.assign('tg://resolve?domain=EventEaseBot');
@@ -159,7 +159,6 @@ export default function Home() {
                                 />
                                 <button
                                     type="submit"
-                                    onClick={handleSubmit}
                                     className="h-12 sm:h-16 w-full sm:w-auto bg-[#C5DF93] text-white rounded-lg mt-2 sm:mt-0 sm:px-6 flex justify-center items-center"
                                 >
                                     <img src="/arrow.svg" alt="next" className="w-6 sm:w-[50px] h-6 sm:h-[70px]" />
@@ -168,7 +167,7 @@ export default function Home() {
                             {showDropdown && (
                                 <div
                                     ref={dropdownRef}
-                                    className={`absolute w-full bg-white shadow-lg rounded-lg z-10 top-full mt-2'}`}
+                                    className={`absolute w-full bg-white shadow-lg rounded-lg z-10 ${window.innerWidth < 640 ? 'bottom-full mb-2' : 'top-full mt-2'}`}
                                 >
                                     <div className="flex flex-wrap gap-2 p-2">
                                         {allPreferences.map(preference => (
