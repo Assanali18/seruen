@@ -50,13 +50,14 @@ export default function Home() {
         try {
             console.log('userPreferences:', userPreferences)
             const response = await axiosInstance.post('/api/users/', userPreferences);
-
+            toast.success('отправляем запрос')
             if (response.status === 201) {
                 if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
                     window.location.assign('tg://resolve?domain=EventEaseBot');
                 } else {
                     window.location.assign('https://t.me/EventEaseBot');
                 }
+                toast.success('Спасибо за регистрацию! Пожалуйста, напишите боту в телеграме');
             } else {
                 console.error('Error fetching recommendations:', response.statusText);
             }
