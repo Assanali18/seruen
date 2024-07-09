@@ -51,7 +51,11 @@ export default function Home() {
             const response = await axiosInstance.post('/api/users/', userPreferences);
 
             if (response.status === 201) {
-                window.location.assign('https://t.me/EventEaseBot');
+                if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                    window.location.assign('tg://resolve?domain=EventEaseBot');
+                } else {
+                    window.location.assign('https://t.me/EventEaseBot');
+                }
             } else {
                 console.error('Error fetching recommendations:', response.statusText);
             }
