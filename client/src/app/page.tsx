@@ -39,7 +39,7 @@ export default function Home() {
         }
 
         const userPreferences: UserPreferencesDTO = {
-            userName: name,
+            userName: name.startsWith('@') ? name.slice(1) : name,
             email,
             phone,
             spendingLimit: parseInt(budget),
@@ -131,11 +131,13 @@ export default function Home() {
                                     onChange={(e) => setBudget(e.target.value)}
                                 >
                                     <option className="text-[#9A9A9A]" value="">Выберите бюджет</option>
-                                    <option value="10000">10000 - 20000 тенге</option>
-                                    <option value="20000">20000 - 30000 тенге</option>
-                                    <option value="30000">30000 - 40000 тенге</option>
-                                    <option value="40000">40000 - 50000 тенге</option>
-                                    <option value="50000">50000+ тенге</option>
+                                    <option value="5000">0 - 5000 тенге</option>
+                                    <option value="10000">5000 - 10000 тенге</option>
+                                    <option value="20000">10000 - 20000 тенге</option>
+                                    <option value="30000">20000 - 30000 тенге</option>
+                                    <option value="40000">30000 - 40000 тенге</option>
+                                    <option value="50000">40000 - 50000 тенге</option>
+                                    <option value="100000">50000+ тенге</option>
                                 </select>
                                 <button
                                     type="button"
@@ -169,7 +171,7 @@ export default function Home() {
                             {showDropdown && (
                                 <div
                                     ref={dropdownRef}
-                                    className={`absolute w-full bg-white shadow-lg rounded-lg z-10 ${window.innerWidth < 640 ? 'bottom-full mb-2' : 'top-full mt-2'}`}
+                                    className={`absolute w-full bg-white shadow-lg rounded-lg z-10 top-full mt-2'}`}
                                 >
                                     <div className="flex flex-wrap gap-2 p-2">
                                         {allPreferences.map(preference => (
