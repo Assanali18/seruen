@@ -15,7 +15,7 @@ class UserService {
       schedule
     });
     console.log('userName from form', userName);
-    
+    // Не добавлять юзера, если он уже есть в базе
 
     await newUser.save();
     console.log('newUser', newUser);

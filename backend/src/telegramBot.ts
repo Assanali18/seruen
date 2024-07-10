@@ -5,7 +5,7 @@ import 'dotenv/config';
 import buyTickets from './buyTickets';
 import { assert } from 'console';
 
-const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN || '';
+const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN_DEV || '';
 if (!TELEGRAM_TOKEN) {
   throw new Error('TELEGRAM_TOKEN is not set');
 }
@@ -53,14 +53,14 @@ bot.onText(/\/start/, async (msg) => {
       const welcomeMessage = `Добро пожаловать, ${userName} в Seruen! Мы очень рады, что вы присоединились к нам. Теперь мы будем присылать вам персонализированные рекомендации по мероприятиям в вашем городе!`;
 
       await bot.sendMessage(chatId, welcomeMessage);
-      await bot.sendMessage(chatId, 'Для управления вашими данными используйте следующие команды:\n' +
-        '/change_email - Изменить email\n' +
-        '/change_phone - Изменить номер телефона\n' +
-        '/change_spendingLimit - Изменить бюджет\n' +
-        '/change_hobbies - Изменить увлечения\n' +
-        '/get_recommendations - Получить рекомендации\n' +
-        '/stop_session - Остановить сеанс'
-      );
+      // await bot.sendMessage(chatId, 'Для управления вашими данными используйте следующие команды:\n' +
+      //   '/change_email - Изменить email\n' +
+      //   '/change_phone - Изменить номер телефона\n' +
+      //   '/change_spendingLimit - Изменить бюджет\n' +
+      //   '/change_hobbies - Изменить увлечения\n' +
+      //   '/get_recommendations - Получить рекомендации\n' +
+      //   '/stop_session - Остановить сеанс'
+      // );
 
       try {
         bot.sendMessage(chatId, 'Готовим для Вас рекомендации...');
@@ -77,17 +77,17 @@ bot.onText(/\/start/, async (msg) => {
   }
 });
 
-bot.onText(/\/change_email/, async (msg) => {
-  const chatId = msg.chat.id;
-  userSetupStages[chatId] = { stage: 0, field: 'email' };
-  await bot.sendMessage(chatId, 'Пожалуйста, введите ваш новый email:');
-});
+// bot.onText(/\/change_email/, async (msg) => {
+//   const chatId = msg.chat.id;
+//   userSetupStages[chatId] = { stage: 0, field: 'email' };
+//   await bot.sendMessage(chatId, 'Пожалуйста, введите ваш новый email:');
+// });
 
-bot.onText(/\/change_phone/, async (msg) => {
-  const chatId = msg.chat.id;
-  userSetupStages[chatId] = { stage: 0, field: 'phone' };
-  await bot.sendMessage(chatId, 'Пожалуйста, введите ваш новый номер телефона:');
-});
+// bot.onText(/\/change_phone/, async (msg) => {
+//   const chatId = msg.chat.id;
+//   userSetupStages[chatId] = { stage: 0, field: 'phone' };
+//   await bot.sendMessage(chatId, 'Пожалуйста, введите ваш новый номер телефона:');
+// });
 
 bot.onText(/\/change_spendingLimit/, async (msg) => {
   const chatId = msg.chat.id;
@@ -101,25 +101,25 @@ bot.onText(/\/change_hobbies/, async (msg) => {
   await bot.sendMessage(chatId, 'Пожалуйста, введите ваши новые увлечения (через запятую):');
 });
 
-bot.onText(/\/get_recommendations/, async (msg) => {
-  const chatId = msg.chat.id;
-  try {
-    const user = await User.findOne({ chatId });
-    if (user) {
-      bot.sendMessage(chatId, 'Готовим для Вас рекомендации...');
-      const recommendations = await getRecommendations(user);
-      user.recommendations = recommendations;
-      user.lastRecommendationIndex = 0;
-      await user.save();
-      sendNextEvent(chatId);
-    } else {
-      await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, начните заново, используя команду /start.');
-    }
-  } catch (error) {
-    console.error(`Ошибка при получении рекомендаций для chatId ${chatId}:`, error);
-    await bot.sendMessage(chatId, 'Извините, произошла ошибка при получении рекомендаций.');
-  }
-});
+// bot.onText(/\/get_recommendations/, async (msg) => {
+//   const chatId = msg.chat.id;
+//   try {
+//     const user = await User.findOne({ chatId });
+//     if (user) {
+//       bot.sendMessage(chatId, 'Готовим для Вас рекомендации...');
+//       const recommendations = await getRecommendations(user);
+//       user.recommendations = recommendations;
+//       user.lastRecommendationIndex = 0;
+//       await user.save();
+//       sendNextEvent(chatId);
+//     } else {
+//       await bot.sendMessage(chatId, 'Произошла ошибка. Пожалуйста, начните заново, используя команду /start.');
+//     }
+//   } catch (error) {
+//     console.error(`Ошибка при получении рекомендаций для chatId ${chatId}:`, error);
+//     await bot.sendMessage(chatId, 'Извините, произошла ошибка при получении рекомендаций.');
+//   }
+// });
 
 bot.onText(/\/stop_session/, async (msg) => {
   const chatId = msg.chat.id;

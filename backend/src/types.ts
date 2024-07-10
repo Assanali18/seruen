@@ -7,8 +7,6 @@ export interface Event {
     venue?: string;
     price?: string;
     ticketLink?: string;
-    reason?: string;
-    creativeDescription?: string;
   }
   
   export interface Seat {

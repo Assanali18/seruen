@@ -1,12 +1,10 @@
-import fs from 'fs';
 import { Event } from './types';
+import EventModel from './event/models/Event';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import 'dotenv/config';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { "responseMimeType": "application/json" } });
-
-const events: Event[] = JSON.parse(fs.readFileSync('events.json', 'utf8'));
 
 const CHUNK_SIZE = 10;
 
@@ -18,16 +16,22 @@ const getEventChunks = (events: Event[], chunkSize: number): Event[][] => {
   return chunks;
 };
 
-export const getRecommendations = async (userPreferences: { salary?: number; hobbies?: string[]; userName?: string; }): Promise<{ venue: string; ticketLink: string; message: string; }[]> => {
+export const getRecommendations = async (userPreferences: { spendingLimit?: number; hobbies?: string[]; userName?: string; }): Promise<{ venue: string; ticketLink: string; message: string; }[]> => {
+  const events = await EventModel.find();
   const eventChunks = getEventChunks(events, CHUNK_SIZE);
 
   const recommendations: { venue: string; ticketLink: string; message: string; }[] = [];
 
   for (const chunk of eventChunks) {
     const userPrompt = `
-      My budget is ${userPreferences.salary}
-      my hobbies are ${JSON.stringify(userPreferences.hobbies)}.
-      Here are some events: ${JSON.stringify(chunk)}
+      I have provided between 0 and 10 events.
+      Please pay special attention to the user's hobbies and budget.
+      The price of the event should not exceed the user's budget.
+      Select as many events as you see fit based on the given criteria.
+      User's budget: ${userPreferences.spendingLimit}
+      User's hobbies: ${JSON.stringify(userPreferences.hobbies)}
+      Events: ${JSON.stringify(chunk)}
+
       Please recommend the most relevant events, sorted by relevance, in a list of creative, interesting, and engaging messages with all necessary details, including the date, time, venue, and appropriate emojis related to the event.
       Use the user's name **${userPreferences.userName}** in the message explaining why they should attend each event. Respond as a professional SMM specialist.
       Be sure that the price of the event was not more expensive than the user's budget by 3000 tenge.
@@ -35,7 +39,7 @@ export const getRecommendations = async (userPreferences: { salary?: number; hob
       Do not invent new events, only use the events provided.
       Discard any events that do not fit the user's preferences based on the provided criteria.
       Return the response as a valid JSON array of objects, each with keys "venue", "ticketLink", and "message" containing the formatted event details.
-      
+
       Example:
       [
         {
