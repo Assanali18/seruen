@@ -5,7 +5,7 @@ import 'dotenv/config';
 import buyTickets from './buyTickets';
 import { assert } from 'console';
 
-const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN_DEV || '';
+const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN_PROD || '';
 if (!TELEGRAM_TOKEN) {
   throw new Error('TELEGRAM_TOKEN is not set');
 }
