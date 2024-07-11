@@ -49,8 +49,8 @@ cron.schedule('0 0 * * *', async () => {
 async function runInitialParsing() {
   console.log('Running initial parsing task');
   try {
-    // const events: CreateEventDto[] = await parseEvents();
-    const events: CreateEventDto[] = JSON.parse(fs.readFileSync('events.json', 'utf-8'));
+    const events: CreateEventDto[] = await parseEvents();
+    // const events: CreateEventDto[] = JSON.parse(fs.readFileSync('events.json', 'utf-8'));
     console.log('Starting to send events to main server');
     
     
@@ -227,4 +227,5 @@ async function parseEvents() {
 
 app.listen(PORT,async() => {
   console.log(`Parser server is running on port ${PORT}`);
+  runInitialParsing();
 });
