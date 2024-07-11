@@ -74,7 +74,10 @@ async function sendEventsToMainServer(events: CreateEventDto[]) {
 }
 
 async function parseEvents() {
-    const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
     const page = await browser.newPage();
     console.log('Page has been opened');
     await page.goto('https://sxodim.com/almaty', { waitUntil: 'load', timeout: 60000 });
