@@ -46,8 +46,7 @@ function runInitialParsing() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('Running initial parsing task');
         try {
-            // const events: CreateEventDto[] = await parseEvents();
-            const events = JSON.parse(fs_1.default.readFileSync('events.json', 'utf-8'));
+            const events = yield parseEvents();
             console.log('Starting to send events to main server');
             yield sendEventsToMainServer(events);
             console.log('Initial parsing and sending successful');
@@ -70,7 +69,10 @@ function sendEventsToMainServer(events) {
 }
 function parseEvents() {
     return __awaiter(this, void 0, void 0, function* () {
-        const browser = yield puppeteer_1.default.launch({ headless: false });
+        console.log("Parsing events");
+        const browser = yield puppeteer_1.default.launch({
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
         const page = yield browser.newPage();
         console.log('Page has been opened');
         yield page.goto('https://sxodim.com/almaty', { waitUntil: 'load', timeout: 60000 });
@@ -200,5 +202,6 @@ function saveEventsToFile(events) {
     console.log('Event data has been saved to events.json');
 }
 app.listen(PORT, () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(`Parser server is running on port ${PORT}`);
+    console.log("asdasd");
+    runInitialParsing();
 }));
