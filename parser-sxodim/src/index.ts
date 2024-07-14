@@ -66,7 +66,7 @@ async function sendEventsToMainServer(events: CreateEventDto[]) {
 
 async function parseEvents() {
   const browser = await puppeteer.launch({
-    ignoreDefaultArgs: ['--disable-setuid-sandbox'],
+    args: ['--no-sandbox'],
     executablePath: process.env.CHROME_BIN || undefined
   });
 
