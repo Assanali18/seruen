@@ -218,7 +218,6 @@ function saveEventsToFile(events: CreateEventDto[]) {
 }
 
 app.listen(PORT, async () => {
-  console.log(`Parser server is running on port ${PORT}`);
   console.log("asdasd");
   runInitialParsing();
 });
