@@ -71,9 +71,8 @@ async function parseEvents() {
   });
 
   const page = await browser.newPage();
+  await page.goto('https://sxodim.com/almaty', { waitUntil: 'load', timeout: 120000 });
   console.log('Page has been opened');
-  await page.goto('https://sxodim.com/almaty', { waitUntil: 'load', timeout: 60000 });
-
   const today = new Date();
   const twoWeeksLater = new Date();
   twoWeeksLater.setDate(today.getDate() + 14);
@@ -144,9 +143,25 @@ async function parseEvents() {
   const eventDetails: CreateEventDto[] = [];
 
   for (const event of bestEvents) {
-    console.log('Opening event page at', event.link);
+    await tryNavigateToEventPage(page, event.link, eventDetails);
+  }
+
+  for (const url of events) {
+    await tryNavigateToEventPage(page, url, eventDetails);
+  }
+
+  console.log('Number of events:', eventDetails.length);
+  await browser.close();
+  console.log('Browser has been closed');
+  saveEventsToFile(eventDetails);
+  return eventDetails;
+}
+
+async function tryNavigateToEventPage(page: any, url: string, eventDetails: CreateEventDto[], attempts = 3) {
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    console.log(`Opening event page at ${url}, attempt ${attempt}`);
     try {
-      await page.goto(event.link, { waitUntil: 'networkidle0', timeout: 60000 });
+      await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
       await page.waitForSelector('.content_wrapper', { timeout: 20000 });
 
       const details: CreateEventDto = await page.evaluate(() => {
@@ -167,49 +182,14 @@ async function parseEvents() {
       });
 
       eventDetails.push(details);
+      break; // если успешно, выйти из цикла попыток
     } catch (error) {
-      console.error('Timeout or navigation error:', error);
-      continue;
-    }
-  }
-
-  for (const url of events) {
-    console.log('Opening event page at', url);
-    try {
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 20000 });
-      await page.waitForSelector('.content_wrapper', { timeout: 20000 });
-
-      const details: CreateEventDto = await page.evaluate(() => {
-        const title = document.querySelector('.title')?.textContent?.trim() || '';
-        const dateElement = document.querySelector('.event_date_block');
-        const fullDate = dateElement?.getAttribute('data-date') ?? null;
-        const date = fullDate ? fullDate.split(' ')[0] : null;
-        
-        const paragraphs = Array.from(document.querySelectorAll('.content_wrapper p'));
-        const description = paragraphs.map(p => p.textContent?.trim()).join(' ');
-        const time = document.querySelector('.more_info .svg-icon--time + .text')?.textContent?.trim() || '';
-        const venue = document.querySelector('.more_info .svg-icon--location + .text')?.textContent?.trim() || '';
-        const price = document.querySelector('.more_info .svg-icon--tenge + .text')?.textContent?.trim() || '';
-        const ticketLinkElement = document.querySelector('.buy-ticket a.btn');
-        const ticketLink = ticketLinkElement ? ticketLinkElement.getAttribute('href') || '' : undefined;
-
-        return { title, date, description, time, venue, price, ticketLink };
-      });
-
-      if (details.date && isWithinTwoWeeks(details.date)) {
-        eventDetails.push(details);
+      console.error(`Timeout or navigation error on attempt ${attempt}:`, error);
+      if (attempt === attempts) {
+        console.error(`Failed to open page at ${url} after ${attempts} attempts.`);
       }
-    } catch (error) {
-      console.error('Timeout or navigation error:', error);
-      continue;
     }
   }
-
-  console.log('Number of events:', eventDetails.length);
-  await browser.close();
-  console.log('Browser has been closed');
-  saveEventsToFile(eventDetails);
-  return eventDetails;
 }
 
 function saveEventsToFile(events: CreateEventDto[]) {
@@ -218,6 +198,5 @@ function saveEventsToFile(events: CreateEventDto[]) {
 }
 
 app.listen(PORT, async () => {
-  console.log("asdasd");
   runInitialParsing();
 });
