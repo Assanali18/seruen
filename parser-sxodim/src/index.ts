@@ -156,11 +156,11 @@ async function parseEvents() {
   return eventDetails;
 }
 
-async function tryNavigateToEventPage(page: any, url: string, eventDetails: CreateEventDto[], isWithinTwoWeeks: (dateText: string) => boolean, attempts = 5) {
+async function tryNavigateToEventPage(page: any, url: string, eventDetails: CreateEventDto[], isWithinTwoWeeks: (dateText: string) => boolean, attempts = 3) {
   for (let attempt = 1; attempt <= attempts; attempt++) {
     console.log(`Opening event page at ${url}, attempt ${attempt}`);
     try {
-      await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+      await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
       await page.waitForSelector('.content_wrapper', { timeout: 20000 });
 
       const details: CreateEventDto = await page.evaluate(() => {
