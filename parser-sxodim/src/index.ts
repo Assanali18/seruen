@@ -73,6 +73,7 @@ async function parseEvents() {
   const page = await browser.newPage();
   await page.goto('https://sxodim.com/almaty', { waitUntil: 'load', timeout: 120000 });
   console.log('Page has been opened');
+
   const today = new Date();
   const twoWeeksLater = new Date();
   twoWeeksLater.setDate(today.getDate() + 14);
@@ -94,8 +95,6 @@ async function parseEvents() {
       return { title, link, date: dateText };
     });
   });
-
-  const allEvents = [];
 
   for (let i = 0; i < 6; i++) {
     console.log('Scrolling to the bottom of the page');
@@ -143,11 +142,11 @@ async function parseEvents() {
   const eventDetails: CreateEventDto[] = [];
 
   for (const event of bestEvents) {
-    await tryNavigateToEventPage(page, event.link, eventDetails);
+    await tryNavigateToEventPage(page, event.link, eventDetails, isWithinTwoWeeks);
   }
 
   for (const url of events) {
-    await tryNavigateToEventPage(page, url, eventDetails);
+    await tryNavigateToEventPage(page, url, eventDetails, isWithinTwoWeeks);
   }
 
   console.log('Number of events:', eventDetails.length);
@@ -157,7 +156,7 @@ async function parseEvents() {
   return eventDetails;
 }
 
-async function tryNavigateToEventPage(page: any, url: string, eventDetails: CreateEventDto[], attempts = 3) {
+async function tryNavigateToEventPage(page: any, url: string, eventDetails: CreateEventDto[], isWithinTwoWeeks: (dateText: string) => boolean, attempts = 5) {
   for (let attempt = 1; attempt <= attempts; attempt++) {
     console.log(`Opening event page at ${url}, attempt ${attempt}`);
     try {
@@ -181,8 +180,10 @@ async function tryNavigateToEventPage(page: any, url: string, eventDetails: Crea
         return { title, date, description, time, venue, price, ticketLink };
       });
 
-      eventDetails.push(details);
-      break; // если успешно, выйти из цикла попыток
+      if (details.date && isWithinTwoWeeks(details.date)) {
+        eventDetails.push(details);
+      }
+      break; 
     } catch (error) {
       console.error(`Timeout or navigation error on attempt ${attempt}:`, error);
       if (attempt === attempts) {
