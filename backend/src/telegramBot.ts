@@ -7,7 +7,7 @@ import { assert } from 'console';
 import EventModel from './event/models/Event';
 
 // CHANGE TOKEN IF YOU DEPLOY
-const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN_DEV || '';
+const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN_PROD || '';
 if (!TELEGRAM_TOKEN) {
   throw new Error('TELEGRAM_TOKEN is not set');
 }

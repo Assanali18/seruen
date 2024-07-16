@@ -8,6 +8,9 @@ class EventController {
         try {
             const events: CreateEventDto[] = req.body;
 
+            await EventModel.deleteMany({});
+            console.log('Events deleted');
+            
             const titles = events.map(event => event.title);
 
 
