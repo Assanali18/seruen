@@ -96,7 +96,7 @@ async function parseTicketonEvents(browser: any): Promise<CreateEventDto[]> {
     for (const link of links) {
       const eventId = link?.split('/').pop()?.split('?')[0];
       console.log(`Fetching details for Ticketon event ID: ${eventId}`);
-      const eventDetails = await fetchTicketonEventDetails(eventId);
+      const eventDetails = await fetchTicketonEventDetails(eventId, 3); // 3 попытки
       if (eventDetails && eventDetails.price !== '0') {
         events.push(eventDetails);
       }
@@ -112,33 +112,37 @@ async function parseTicketonEvents(browser: any): Promise<CreateEventDto[]> {
   }
 }
 
-async function fetchTicketonEventDetails(eventId: string | undefined): Promise<CreateEventDto | null> {
+async function fetchTicketonEventDetails(eventId: string | undefined, retries: number) {
   if (!eventId) {
     console.error('Ticketon event ID is undefined');
     return null;
   }
   
-  try {
-    const response = await axios.get(`https://ticketon.kz/api/v1/event/${eventId}`);
-    const data = response.data.data;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await axios.get(`https://ticketon.kz/api/v1/event/${eventId}`);
+      const data = response.data.data;
 
-    const description = cleanDescription(data.description);
-    
-    const dateInfo = data.info.find((info: { title: string; }) => info.title === 'Дата')?.value[0] || '';
-    const timeInfo = data.info.find((info: { title: string; }) => info.title === 'Время' || info.title === 'Начало' )?.value[0] || '';
+      const description = cleanDescription(data.description);
+      
+      const dateInfo = data.info.find((info: { title: string; }) => info.title === 'Дата')?.value[0] || '';
+      const timeInfo = data.info.find((info: { title: string; }) => info.title === 'Время' || info.title === 'Начало' )?.value[0] || '';
 
-    return {
-      title: data.title,
-      date: dateInfo,
-      time: timeInfo,
-      description: description,
-      venue: data.info.find((info: { title: string; }) => info.title === 'Место проведения')?.value[0] || '',
-      price: data.price ? `${data.price}` : '0',
-      ticketLink: `https://ticketon.kz/event/${eventId}`,
-    };
-  } catch (error) {
-    console.error(`Error fetching details for Ticketon event ID: ${eventId}`, error);
-    return null;
+      return {
+        title: data.title,
+        date: dateInfo,
+        time: timeInfo,
+        description: description,
+        venue: data.info.find((info: { title: string; }) => info.title === 'Место проведения')?.value[0] || '',
+        price: data.price ? `${data.price}` : '0',
+        ticketLink: `https://ticketon.kz/event/${eventId}`,
+      };
+    } catch (error) {
+      console.error(`Error fetching details for Ticketon event ID: ${eventId}, attempt ${attempt}`, error);
+      if (attempt === retries) {
+        return null;
+      }
+    }
   }
 }
 
@@ -180,8 +184,8 @@ async function parseYandexEvents(browser: any): Promise<CreateEventDto[]> {
     const eventsWithPrice = events.filter((event: CreateEventDto) => event.price !== '0');
 
     for (const event of eventsWithPrice) {
-      const details = await fetchYandexEventDetails(event.ticketLink, browser);
-      event.description = details.description;
+      const details = await fetchYandexEventDetails(event.ticketLink, browser, 3); // 3 попытки
+      event.description = details?.description;
     }
 
     return eventsWithPrice;
@@ -194,24 +198,28 @@ async function parseYandexEvents(browser: any): Promise<CreateEventDto[]> {
   }
 }
 
-async function fetchYandexEventDetails(url: string|undefined, browser: any): Promise<{ description: string }> {
-  const page = await browser.newPage();
-  try {
-    await page.goto(url, { waitUntil: 'load', timeout: 60000 });
-    console.log(`Page opened for details: ${url}`);
-    
-    const description = await page.evaluate(() => {
-      const descriptionElement = document.querySelector('.concert-description__text-wrap') as HTMLElement;
-      return descriptionElement ? descriptionElement.innerText : '';
-    });
+async function fetchYandexEventDetails(url: string | undefined, browser: any, retries: number) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    const page = await browser.newPage();
+    try {
+      await page.goto(url, { waitUntil: 'load', timeout: 60000 });
+      console.log(`Page opened for details: ${url}`);
+      
+      const description = await page.evaluate(() => {
+        const descriptionElement = document.querySelector('.concert-description__text-wrap') as HTMLElement;
+        return descriptionElement ? descriptionElement.innerText : '';
+      });
 
-    return { description: formatDescription(description) };
-  } catch (error) {
-    console.error(`Error fetching details from Yandex Afisha page: ${url}`, error);
-    return { description: '' };
-  } finally {
-    await page.close();
-    console.log(`Details page closed for: ${url}`);
+      return { description: formatDescription(description) };
+    } catch (error) {
+      console.error(`Error fetching details from Yandex Afisha page: ${url}, attempt ${attempt}`, error);
+      if (attempt === retries) {
+        return { description: '' };
+      }
+    } finally {
+      await page.close();
+      console.log(`Details page closed for: ${url}`);
+    }
   }
 }
 
