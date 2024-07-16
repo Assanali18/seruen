@@ -16,6 +16,7 @@ export interface IUser extends Document {
   chatId?: string;
   recommendations?: any[];
   lastRecommendationIndex?: number;
+  stopSession: boolean;
 }
 
 const UserSchema: Schema = new Schema({
@@ -27,7 +28,8 @@ const UserSchema: Schema = new Schema({
   schedule: { type: [String] },
   chatId: { type: String },
   recommendations: [recommendationSchema],
-  lastRecommendationIndex: { type: Number, default: 0 }
+  lastRecommendationIndex: { type: Number, default: 0 },
+  stopSession: { type: Boolean, default: false }
 });
 
 export default mongoose.model<IUser>('User', UserSchema);

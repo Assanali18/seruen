@@ -7,17 +7,17 @@ class EventController {
     createEvents = async (req: Request, res: Response) => {
         try {
             const events: CreateEventDto[] = req.body;
+            const source = req.query.source as string;
 
-            await EventModel.deleteMany({});
-            console.log('Events deleted');
-            
-            const titles = events.map(event => event.title);
+            if (!source) {
+                res.status(400).send('Source is required');
+                return;
+            }
 
+            await EventModel.deleteMany({ source });
+            console.log(`Events from source ${source} deleted`);
 
-            const existingEvents = await EventModel.find({ title: { $in: titles } });
-            const existingTitles = existingEvents.map(event => event.title);
-
-            const uniqueEvents = events.filter(event => !existingTitles.includes(event.title));
+            const uniqueEvents = events.map(event => ({ ...event, source })); 
 
             if (uniqueEvents.length > 0) {
                 await EventModel.insertMany(uniqueEvents);

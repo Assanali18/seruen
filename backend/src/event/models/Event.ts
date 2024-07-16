@@ -8,6 +8,7 @@ export interface IEvent extends Document {
   venue?: string;
   price?: string;
   ticketLink?: string;
+  source?: string;
 }
 
 export const EventSchema:Schema = new Schema({     
@@ -18,6 +19,7 @@ export const EventSchema:Schema = new Schema({
   venue: { type: String },
   price: { type: String },
   ticketLink: { type: String },
+  source: String,
 });
 
 export default mongoose.model<IEvent>('Event', EventSchema);

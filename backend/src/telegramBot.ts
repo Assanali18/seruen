@@ -7,7 +7,7 @@ import { assert } from 'console';
 import EventModel from './event/models/Event';
 
 // CHANGE TOKEN IF YOU DEPLOY
-const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN_PROD || '';
+const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN_DEV || '';
 if (!TELEGRAM_TOKEN) {
   throw new Error('TELEGRAM_TOKEN is not set');
 }
@@ -42,7 +42,8 @@ bot.onText(/\/start/, async (msg) => {
         userName,
         chatId,
         recommendations: [],
-        lastRecommendationIndex: 0
+        lastRecommendationIndex: 0,
+        stopSession: false
       });
       await user.save();
       userSetupStages[chatId] = { stage: 0 };
@@ -50,6 +51,7 @@ bot.onText(/\/start/, async (msg) => {
       await bot.sendMessage(chatId, `Добро пожаловать, ${userName} в Seruen! Мы очень рады, что вы присоединились к нам. Давайте немного познакомимся, и мы будем присылать вам персонализированные рекомендации по мероприятиям в вашем городе! Для начала введите свой email:`);
     } else {
       user.chatId = chatId.toString();
+      user.stopSession = false;
       await user.save();
 
       const welcomeMessage = `Добро пожаловать, ${userName} в Seruen! Мы очень рады, что вы присоединились к нам. Теперь мы будем присылать вам персонализированные рекомендации по мероприятиям в вашем городе!`;
@@ -74,6 +76,11 @@ bot.onText(/\/start/, async (msg) => {
         user.lastRecommendationIndex = 0;
       
         for (const chunk of eventChunks) {
+          const userSession = await User.findOne({ chatId });
+          if (userSession?.stopSession) {
+            await bot.sendMessage(chatId, 'Сеанс завершен.');
+            return;
+          }
           const recommendations = await getRecommendations(chunk, user);
           userRecomendation.push(...recommendations);
           console.log("USERRECOMMENDATIONS",userRecomendation);
@@ -141,6 +148,11 @@ bot.onText(/\/change_hobbies/, async (msg) => {
 
 bot.onText(/\/stop_session/, async (msg) => {
   const chatId = msg.chat.id;
+  const user = await User.findOne({ chatId });
+  if (user) {
+    user.stopSession = true;
+    await user.save();
+  }
   delete userSetupStages[chatId];
   await bot.sendMessage(chatId, 'Сеанс завершен. Если захотите начать снова, используйте команду /start.');
 });
@@ -212,6 +224,11 @@ bot.on('message', async (msg) => {
     user.lastRecommendationIndex = 0;
   
     for (const chunk of eventChunks) {
+      const userSession = await User.findOne({ chatId });
+      if (userSession?.stopSession) {
+        await bot.sendMessage(chatId, 'Сеанс завершен.');
+        return;
+      }
       const recommendations = await getRecommendations(chunk, user);
       userRecomendation.push(...recommendations);
       console.log("USERRECOMMENDATIONS",userRecomendation);
@@ -230,14 +247,15 @@ bot.on('message', async (msg) => {
 });
 
 const sendNextEvent = async (chatId) => {
-  console.log(chatId);
-  
-  
   const user = await User.findOne({ chatId });
-  console.log(user);
-  
+
   if (!user || !user.recommendations || user.recommendations.length === 0) {
     await bot.sendMessage(chatId, 'У вас нет рекомендаций. Пожалуйста, сначала получите рекомендации.');
+    return;
+  }
+
+  if (user.stopSession) {
+    await bot.sendMessage(chatId, 'Сеанс завершен.');
     return;
   }
 
