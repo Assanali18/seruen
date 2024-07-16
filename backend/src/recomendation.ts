@@ -1,14 +1,15 @@
 import { Event } from './types';
 import EventModel from './event/models/Event';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 import 'dotenv/config';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { "responseMimeType": "application/json" } });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || '',
+});
 
 const CHUNK_SIZE = 10;
 
-const getEventChunks = (events: Event[], chunkSize: number): Event[][] => {
+export const getEventChunks = (events: Event[], chunkSize: number): Event[][] => {
   const chunks: Event[][] = [];
   for (let i = 0; i < events.length; i += chunkSize) {
     chunks.push(events.slice(i, i + chunkSize));
@@ -16,17 +17,19 @@ const getEventChunks = (events: Event[], chunkSize: number): Event[][] => {
   return chunks;
 };
 
-export const getRecommendations = async (userPreferences: { spendingLimit?: number; hobbies?: string[]; userName?: string; }): Promise<{ venue: string; ticketLink: string; message: string; }[]> => {
-  const events = await EventModel.find();
-  const eventChunks = getEventChunks(events, CHUNK_SIZE);
+export const getRecommendations = async (chunk: Event[], userPreferences: { spendingLimit?: number; hobbies?: string[]; userName?: string; }): Promise<{ venue: string; ticketLink: string; message: string; }[]> => {
 
-  const recommendations: { venue: string; ticketLink: string; message: string; }[] = [];
 
-  for (const chunk of eventChunks) {
+  chunk.forEach(event => {
+    console.log("Title : ", event.title, "Price : ", event.price, "Date : ", event.date );
+  });
+      
+    
     const userPrompt = `
       I have provided between 0 and 10 events.
       Please pay special attention to the user's hobbies and budget.
-      The price of the event should not exceed the user's budget.
+      Fistly, the recomended events should be based on user's hobbies.
+      Secondly, the price of the event should not exceed the user's budget.
       Select as many events as you see fit based on the given criteria.
       User's budget: ${userPreferences.spendingLimit}
       User's hobbies: ${JSON.stringify(userPreferences.hobbies)}
@@ -38,7 +41,8 @@ export const getRecommendations = async (userPreferences: { spendingLimit?: numb
       Avoid repeating events in the recommendations.
       Do not invent new events, only use the events provided.
       Discard any events that do not fit the user's preferences based on the provided criteria.
-      Return the response as a valid JSON array of objects, each with keys "venue", "ticketLink", and "message" containing the formatted event details.
+      Return the response as a valid array of objects, each with keys "venue", "ticketLink", and "message" containing the formatted event details.
+      If you are unable to find any events that meet the user's criteria, return an empty array.
 
       Example:
       [
@@ -53,16 +57,45 @@ export const getRecommendations = async (userPreferences: { spendingLimit?: numb
     console.log('Sending message for chunk...');
 
     try {
-      const response = await model.generateContent(userPrompt);
-      const responseText = await response.response.text();
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: userPrompt },
+        ],
+      });
+
+      const responseText = response.choices[0].message.content || '';
       console.log('Response:', responseText);
 
-      const parsedResponse = JSON.parse(responseText);
-      recommendations.push(...parsedResponse);
+      const cleanResponseText = responseText.replace(/[\u0000-\u001F\u007F-\u009F]/g, (char) => {
+        if (char === '\n' || char === '\t') {
+          return char;
+        }
+        return '';
+      });
+  
+      // Additional replacements to ensure proper JSON formatting
+      const formattedResponseText = cleanResponseText
+        .replace(/\\n/g, '\\\\n')
+        .replace(/\\r/g, '\\\\r')
+        .replace(/\\t/g, '\\\\t')
+        .replace(/\\\"/g, '\\\\"');
+  
+      console.log('Clean Response:', formattedResponseText);
+  
+      // Parse the cleaned and formatted response text as JSON
+      const parsedResponse = JSON.parse(formattedResponseText);
+  
+      if (Array.isArray(parsedResponse)) {
+        return parsedResponse;
+      } else {
+        console.warn('Unexpected response format:', parsedResponse);
+        return [];
+      }
+  
     } catch (error) {
       console.error('Error during communication or parsing:', error);
-      continue;
+      return [];
     }
+  
   }
-  return recommendations;
-};

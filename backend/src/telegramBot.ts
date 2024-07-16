@@ -1,11 +1,13 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { getRecommendations } from './recomendation';
+import { getEventChunks, getRecommendations } from './recomendation';
 import User from './user/models/User';
 import 'dotenv/config';
 import buyTickets from './buyTickets';
 import { assert } from 'console';
+import EventModel from './event/models/Event';
 
-const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN_PROD || '';
+// CHANGE TOKEN IF YOU DEPLOY
+const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN_DEV || '';
 if (!TELEGRAM_TOKEN) {
   throw new Error('TELEGRAM_TOKEN is not set');
 }
@@ -24,7 +26,7 @@ interface UserPreferences {
     url: string;
     chatId: string;
   };
-}
+} 
 
 const userSetupStages: { [chatId: string]: { stage: number, field?: string } } = {};
 
@@ -64,11 +66,27 @@ bot.onText(/\/start/, async (msg) => {
 
       try {
         bot.sendMessage(chatId, 'Готовим для Вас рекомендации...');
-        const recommendations = await getRecommendations(user);
-        user.recommendations = recommendations;
+        const CHUNK_SIZE = 10;
+        const events = await EventModel.find();
+        const eventChunks = getEventChunks(events, CHUNK_SIZE);
+        const userRecomendation: { venue: string; ticketLink: string; message: string; }[] = [];
+    
         user.lastRecommendationIndex = 0;
-        await user.save();
-        sendNextEvent(chatId);
+      
+        for (const chunk of eventChunks) {
+          const recommendations = await getRecommendations(chunk, user);
+          userRecomendation.push(...recommendations);
+          console.log("USERRECOMMENDATIONS",userRecomendation);
+          
+          user.recommendations = userRecomendation;
+          console.log('DB RECOMEN', user.recommendations);
+          await user.save();
+          await sendNextEvent(chatId); 
+        }
+    
+    
+        
+        
       } catch (error) {
         console.error(`Ошибка при получении рекомендаций для chatId ${chatId}:`, error);
         await bot.sendMessage(chatId, 'Извините, произошла ошибка при получении рекомендаций.');
@@ -186,12 +204,25 @@ bot.on('message', async (msg) => {
 
   try {
     bot.sendMessage(chatId, 'Готовим для Вас рекомендации...');
-    const recommendations = await getRecommendations(user);
-    user.recommendations = recommendations;
-    user.lastRecommendationIndex = 0;
-    await user.save();
+    const CHUNK_SIZE = 10;
+    const events = await EventModel.find();
+    const eventChunks = getEventChunks(events, CHUNK_SIZE);
+    const userRecomendation: { venue: string; ticketLink: string; message: string; }[] = [];
 
-    sendNextEvent(chatId);
+    user.lastRecommendationIndex = 0;
+  
+    for (const chunk of eventChunks) {
+      const recommendations = await getRecommendations(chunk, user);
+      userRecomendation.push(...recommendations);
+      console.log("USERRECOMMENDATIONS",userRecomendation);
+      
+      user.recommendations = userRecomendation;
+      await sendNextEvent(chatId); 
+    }
+
+
+    
+    await user.save();
   } catch (error) {
     console.error(`Ошибка при получении рекомендаций для chatId ${chatId}:`, error);
     await bot.sendMessage(chatId, 'Извините, произошла ошибка при получении рекомендаций.');
@@ -199,7 +230,12 @@ bot.on('message', async (msg) => {
 });
 
 const sendNextEvent = async (chatId) => {
+  console.log(chatId);
+  
+  
   const user = await User.findOne({ chatId });
+  console.log(user);
+  
   if (!user || !user.recommendations || user.recommendations.length === 0) {
     await bot.sendMessage(chatId, 'У вас нет рекомендаций. Пожалуйста, сначала получите рекомендации.');
     return;
