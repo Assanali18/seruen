@@ -55,9 +55,9 @@ async function runInitialParsing() {
   }
 }
 
-async function sendEventsToMainServer(events: CreateEventDto[]) {
+async function sendEventsToMainServer(events: CreateEventDto[], source='sxodim') {
   try {
-    const response = await axios.post(`${process.env.MAIN_SERVER_URL}/api/events`, events);
+    const response = await axios.post(`${process.env.MAIN_SERVER_URL}/api/events?source=${source}`, events);
     console.log('Events successfully sent to main server:', response.status);
   } catch (error) {
     console.error('Error sending events to main server:', error);
