@@ -25,10 +25,10 @@ app.post('/parse', async (req, res) => {
   try {
     const events: CreateEventDto[] = await parseEvents();
     await sendEventsToMainServer(events);
-    res.status(200).send('Parsing and sending successful');
+    res.status(200).send('Parsing and sending successful for ticketon and yandex events');
   } catch (error) {
     console.error('Error during parsing or sending:', error);
-    res.status(500).send('Error during parsing or sending');
+    res.status(500).send('Error during parsing or sending for ticketon and yandex events');
   }
 });
 
