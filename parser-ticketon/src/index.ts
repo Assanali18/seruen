@@ -56,10 +56,10 @@ async function runInitialParsing() {
   }
 }
 
-async function sendEventsToMainServer(events: CreateEventDto[]) {
+async function sendEventsToMainServer(events: CreateEventDto[], source='ticketon-yandex') {
   try {
     console.log('Sending events to main server:', events);
-    const response = await axios.post(`${process.env.MAIN_SERVER_URL}/api/events`, events);
+    const response = await axios.post(`${process.env.MAIN_SERVER_URL}/api/events?source=${source}`, events);
     console.log('Events successfully sent to main server:', response.status);
   } catch (error) {
     console.error('Error sending events to main server:', error);
