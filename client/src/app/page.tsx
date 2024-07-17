@@ -17,6 +17,7 @@ export default function Home() {
     const [currentStep, setCurrentStep] = useState(0);
     const [showDropdown, setShowDropdown] = useState(false);
     const [customPreference, setCustomPreference] = useState('');
+    const customPreferenceRef = useRef<HTMLInputElement>(null);
 
     const allPreferences = ['🎵 Музыка', '🎨 Искусство', '🏃 Спорт', '🌍 Путешествия', '🍲 Еда', '🎭 Театр', '🎤 Комедия', '🎉 Фестиваль', '🛠️ Развитие'];
     const allPreferencesNames = allPreferences.map(p => p.split(' ')[1]);
@@ -85,6 +86,12 @@ export default function Home() {
             e.preventDefault();
             setPreferences(prev => [...prev, customPreference.trim()]);
             setCustomPreference('');
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            setCustomPreference('');
+            if (customPreferenceRef.current) {
+                customPreferenceRef.current.blur();
+            }
         }
     };
 
@@ -114,11 +121,12 @@ export default function Home() {
         };
     }, [dropdownRef]);
 
-    // Позиции велосипедиста и флажков
-    const cyclistPositions = ['0%', '50%', '100%'];
+    const getCyclistPosition = () => {
+        return (currentStep / 1.15) * (window.innerWidth / 2);
+    };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-[#e0f7fa] bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('/bg-almaty.png')` }}>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-[#e0f7fa] bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/bg-almaty.png)' }}>
             <header className="flex items-center justify-start sm:justify-center w-full p-4 bg-[#C5DF93] fixed top-0 z-10 sm:static sm:w-[60%] sm:rounded-[30px] sm:mt-6 sm:p-4">
                 <div className="text-white text-lg sm:hidden">seruen</div>
                 <div className="hidden sm:block font-semibold text-white text-4xl">seruen</div>
@@ -155,7 +163,8 @@ export default function Home() {
                                     onClick={handleNext}
                                     className="h-12 sm:h-16 w-full sm:w-auto bg-[#C5DF93] text-white rounded-lg mt-2 sm:mt-0 sm:px-6 flex justify-center items-center transition-transform duration-300 transform hover:scale-105"
                                 >
-                                    <img src="/arrow.svg" alt="next" className="w-6 sm:w-[50px] h-6 sm:h-[60px]" />
+                                    <span className="sm:hidden">Далее</span>
+                                    <img src="/arrow.svg" alt="next" className="hidden sm:block w-6 sm:w-[50px] h-6 sm:h-[60px]" />
                                 </button>
                             </div>
                         </div>
@@ -194,7 +203,8 @@ export default function Home() {
                                     onClick={handleNext}
                                     className="h-12 sm:h-16 w-full sm:w-auto bg-[#C5DF93] text-white rounded-lg mt-2 sm:mt-0 sm:px-6 flex justify-center items-center transition-transform duration-300 transform hover:scale-105"
                                 >
-                                    <img src="/arrow.svg" alt="next" className="w-6 sm:w-[50px] h-6 sm:h-[70px]" />
+                                    <span className="sm:hidden">Далее</span>
+                                    <img src="/arrow.svg" alt="next" className="hidden sm:block w-6 sm:w-[50px] h-6 sm:h-[70px]" />
                                 </button>
                             </div>
                         </div>
@@ -221,57 +231,60 @@ export default function Home() {
                                     >
                                         Предпочтения
                                     </label>
+                                    {showDropdown && (
+                                        <div
+                                            ref={dropdownRef}
+                                            className="absolute w-full bg-white shadow-lg rounded-lg z-10 top-full mt-2"
+                                        >
+                                            <div className="flex flex-wrap gap-2 p-2">
+                                                {allPreferences.map(preference => (
+                                                    <div
+                                                        key={preference}
+                                                        className={`cursor-pointer px-4 py-2 rounded-full flex items-center justify-between ${preferences.includes(preference.split(' ')[1]) ? 'bg-[#C5DF93] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+                                                        onClick={() => handlePreferencesChange(preference)}
+                                                    >
+                                                        <span>{preference}</span>
+                                                        {preferences.includes(preference.split(' ')[1]) && (
+                                                            <button type="button" onClick={(e) => handleRemovePreference(e, preference.split(' ')[1])} className="ml-2 text-white">&times;</button>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                                <input
+                                                    type="text"
+                                                    ref={customPreferenceRef}
+                                                    className="block py-2 px-4 w-full text-sm text-black bg-white bg-opacity-75 rounded-full border-[#C5DF93] border-2 focus:outline-none focus:ring-0 focus:border-[#C5DF93] mt-2"
+                                                    placeholder="Добавить свои предпочтения"
+                                                    value={customPreference}
+                                                    onChange={handleCustomPreferenceChange}
+                                                    onKeyDown={handleCustomPreferenceAdd}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <button
                                     type="submit"
                                     className="h-12 sm:h-16 w-full sm:w-auto bg-[#C5DF93] text-white rounded-lg mt-2 sm:mt-0 sm:px-6 flex justify-center items-center transition-transform duration-300 transform hover:scale-105"
                                 >
-                                    <img src="/arrow.svg" alt="submit" className="w-6 sm:w-[50px] h-6 sm:h-[70px]" />
+                                    <span className="sm:hidden">Далее</span>
+                                    <img src="/arrow.svg" alt="submit" className="hidden sm:block w-6 sm:w-[50px] h-6 sm:h-[70px]" />
                                 </button>
                             </div>
-                            {showDropdown && (
-                                <div
-                                    ref={dropdownRef}
-                                    className={`absolute w-full bg-white shadow-lg rounded-lg z-10 top-full mt-2'}`}
-                                >
-                                    <div className="flex flex-wrap gap-2 p-2">
-                                        {allPreferences.map(preference => (
-                                            <div
-                                                key={preference}
-                                                className={`cursor-pointer px-4 py-2 rounded-full flex items-center justify-between ${preferences.includes(preference.split(' ')[1]) ? 'bg-[#C5DF93] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
-                                                onClick={() => handlePreferencesChange(preference)}
-                                            >
-                                                <span>{preference}</span>
-                                                {preferences.includes(preference.split(' ')[1]) && (
-                                                    <button type="button" onClick={(e) => handleRemovePreference(e, preference.split(' ')[1])} className="ml-2 text-white">&times;</button>
-                                                )}
-                                            </div>
-                                        ))}
-                                        <input
-                                            type="text"
-                                            className="block py-2 px-4 w-full text-sm text-black bg-white bg-opacity-75 rounded-full border-[#C5DF93] border-2 focus:outline-none focus:ring-0 focus:border-[#C5DF93] mt-2"
-                                            placeholder="Добавить свои предпочтения"
-                                            value={customPreference}
-                                            onChange={handleCustomPreferenceChange}
-                                            onKeyDown={handleCustomPreferenceAdd}
-                                        />
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     )}
                 </form>
                 <ToastContainer autoClose={3000} />
-                <div className="absolute bottom-4 w-full h-12 flex justify-between items-center">
+                <div className="hidden sm:flex absolute bottom-7 w-full h-12 justify-between items-center">
                     <div className="relative w-full h-full flex justify-between items-center px-20">
-                        <img src="/flag.png" alt="start flag" className="h-12" />
+                        <img src="/flag.png" alt="start flag" className="h-20" />
                         <img
                             src="/velo.png"
                             alt="cyclist"
-                            className="absolute h-20 transition-transform duration-300 pb-4"
-                            style={{ transform: `translateX(${(currentStep / 2) * 100}%)` }}
+                            className="absolute h-32 transition-transform duration-1000 pb-6"
+                            style={{ transform: `translateX(${getCyclistPosition()}px)` }}
                         />
-                        <img src="/flag.png" alt="end flag" className="h-12" />
+                        <img src="/flag.png" alt="end flag" className="h-20" />
+                        <img src="/flag.png" alt="end flag" className="h-20" />
                     </div>
                 </div>
                 {currentStep !== 0 && (
