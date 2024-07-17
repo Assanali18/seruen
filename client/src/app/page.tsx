@@ -32,6 +32,10 @@ export default function Home() {
         }
     };
 
+    const handlePrevious = () => {
+        setCurrentStep(currentStep - 1);
+    };
+
     const handleSubmit = async (e: any) => {
         e.preventDefault();
 
@@ -148,7 +152,8 @@ export default function Home() {
                                         type="text"
                                         name="floating_username"
                                         id="floating_username"
-                                        className="block py-2.5 pl-32 pr-4 w-full h-12 sm:h-16 text-sm sm:text-lg text-black bg-white bg-opacity-75 rounded-full border-[#C5DF93] border-2 focus:outline-none focus:ring-0 focus:border-[#C5DF93] peer"
+                                        className="block py-2.5 pr-4 w-full h-12 sm:h-16 text-sm sm:text-lg text-black bg-white bg-opacity-75 rounded-full border-[#C5DF93] border-2 focus:outline-none focus:ring-0 focus:border-[#C5DF93] peer"
+                                        style={{ paddingLeft: 'calc(7.5em)' }}
                                         placeholder=" "
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
@@ -275,6 +280,14 @@ export default function Home() {
                             </div>
                         </div>
                     )}
+                    {currentStep !== 0 && (
+                        <div
+                            onClick={handlePrevious}
+                            className="sm:hidden h-12 w-full text-[#9A9A9A] mt-2 sm:mt-0 underline sm:px-6 flex justify-center items-center transition-colors duration-300 hover:text-[#C5DF93]"
+                        >
+                            Назад
+                        </div>
+                    )}
                 </form>
                 <ToastContainer autoClose={3000} />
                 <div className="hidden sm:flex absolute bottom-7 w-full h-12 justify-between items-center">
@@ -292,7 +305,7 @@ export default function Home() {
                 </div>
                 {currentStep !== 0 && (
                     <div className="absolute top-4 left-4 sm:static text-[#9A9A9A] pt-6 text-opacity-80 text-sm underline cursor-pointer text-left transition-colors duration-300 hover:text-[#C5DF93]"
-                         onClick={() => setCurrentStep(currentStep - 1)}
+                         onClick={handlePrevious}
                     >Назад</div>
                 )}
             </main>
