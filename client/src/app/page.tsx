@@ -122,7 +122,10 @@ export default function Home() {
     }, [dropdownRef]);
 
     const getCyclistPosition = () => {
-        return (currentStep / 1.15) * (window.innerWidth / 2);
+        if (typeof window !== 'undefined') {
+            return (currentStep / 1.15) * (window.innerWidth / 2);
+        }
+        return 0;
     };
 
     return (
