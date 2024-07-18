@@ -14,7 +14,7 @@ interface CreateEventDto {
   venue?: string;
   price?: string;
   ticketLink?: string;
-  views?: number;
+  views?: string;
 }
 
 const app = express();
