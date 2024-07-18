@@ -22,6 +22,7 @@ export default function Home() {
     const allPreferences = ['🎵 Музыка', '🎨 Искусство', '🏃 Спорт', '🌍 Путешествия', '🍲 Еда', '🎭 Театр', '🎤 Комедия', '🎉 Фестиваль', '🛠️ Развитие'];
     const allPreferencesNames = allPreferences.map(p => p.split(' ')[1]);
 
+
     const handleNext = () => {
         if ((currentStep === 0 && !name) ||
             (currentStep === 1 && !budget) ||
