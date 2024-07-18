@@ -14,6 +14,7 @@ interface CreateEventDto {
   venue?: string;
   price?: string;
   ticketLink?: string;
+  views?: number;
 }
 
 const app = express();
@@ -136,6 +137,7 @@ async function fetchTicketonEventDetails(eventId: string | undefined, retries: n
         venue: data.info.find((info: { title: string; }) => info.title === 'Место проведения')?.value[0] || '',
         price: data.price ? `${data.price}` : '0',
         ticketLink: `https://ticketon.kz/event/${eventId}`,
+        views: data.viewed || 0,
       };
     } catch (error) {
       console.error(`Error fetching details for Ticketon event ID: ${eventId}, attempt ${attempt}`, error);
