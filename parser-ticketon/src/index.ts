@@ -15,6 +15,7 @@ interface CreateEventDto {
   price?: string;
   ticketLink?: string;
   views?: string;
+  tags?: string[];
 }
 
 const app = express();
@@ -129,15 +130,18 @@ async function fetchTicketonEventDetails(eventId: string | undefined, retries: n
       const dateInfo = data.info.find((info: { title: string; }) => info.title === 'Дата')?.value[0] || '';
       const timeInfo = data.info.find((info: { title: string; }) => info.title === 'Время' || info.title === 'Начало' )?.value[0] || '';
 
+      const tags = data.info.find((info: { title: string; }) => info.title === 'Жанр')?.value || [];
+
       return {
         title: data.title,
         date: dateInfo,
         time: timeInfo,
         description: description,
-        venue: data.info.find((info: { title: string; }) => info.title === 'Место проведения')?.value[0] || '',
+        venue: data.info.find((info: { title: string; }) => info.title === 'Место проведения' || info.title === 'Место проведение' )?.value[0] || '',
         price: data.price ? `${data.price}` : '0',
         ticketLink: `https://ticketon.kz/event/${eventId}`,
         views: data.viewed || 0,
+        tags: tags,
       };
     } catch (error) {
       console.error(`Error fetching details for Ticketon event ID: ${eventId}, attempt ${attempt}`, error);
@@ -178,7 +182,8 @@ async function parseYandexEvents(browser: any): Promise<CreateEventDto[]> {
           venue: data.place?.title,
           price: data.ticketsPrice ? data.ticketsPrice.replace('&nbsp;', ' ') : '0',
           ticketLink: `https://afisha.yandex.kz${data.link}`,
-          description: '', // Will be filled after fetching additional details
+          description: '',
+          tags: data.tags || [],  
         };
       });
     });

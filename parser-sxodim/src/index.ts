@@ -16,6 +16,7 @@ interface CreateEventDto {
   price?: string;
   ticketLink?: string;
   views?: string;
+  tags?: string[];
 }
 
 const app = express();
@@ -178,8 +179,9 @@ async function tryNavigateToEventPage(page: any, url: string, eventDetails: Crea
         const ticketLinkElement = document.querySelector('.buy-ticket a.btn');
         const ticketLink = ticketLinkElement ? ticketLinkElement.getAttribute('href') || '' : undefined;
         const views = document.querySelector('.views')?.textContent?.trim() || '';
+        const tags = Array.from(document.querySelectorAll('.tags .tag')).map(tag => tag.textContent?.trim() || '');
 
-        return { title, date, description, time, venue, price, ticketLink, views };
+        return { title, date, description, time, venue, price, ticketLink, views, tags };
       });
 
       if (details.date && isWithinTwoWeeks(details.date)) {
