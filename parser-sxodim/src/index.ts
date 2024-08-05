@@ -76,16 +76,6 @@ async function parseEvents() {
   await page.goto('https://sxodim.com/almaty', { waitUntil: 'load', timeout: 120000 });
   console.log('Page has been opened');
 
-  const today = new Date();
-  const twoWeeksLater = new Date();
-  twoWeeksLater.setDate(today.getDate() + 14);
-
-  const isWithinTwoWeeks = (dateText: string) => {
-    const [day, month, year] = dateText.split('.').map(Number);
-    const eventDate = new Date(year, month - 1, day);
-    return eventDate >= today && eventDate <= twoWeeksLater;
-  };
-
   const bestEvents = await page.evaluate(() => {
     return Array.from(document.querySelectorAll('.impression-best .impression-card')).map(card => {
       const titleElement = card.querySelector('.impression-card-title');
@@ -144,11 +134,11 @@ async function parseEvents() {
   const eventDetails: CreateEventDto[] = [];
 
   for (const event of bestEvents) {
-    await tryNavigateToEventPage(page, event.link, eventDetails, isWithinTwoWeeks);
+    await tryNavigateToEventPage(page, event.link, eventDetails);
   }
 
   for (const url of events) {
-    await tryNavigateToEventPage(page, url, eventDetails, isWithinTwoWeeks);
+    await tryNavigateToEventPage(page, url, eventDetails);
   }
 
   console.log('Number of events:', eventDetails.length);
@@ -158,7 +148,7 @@ async function parseEvents() {
   return eventDetails;
 }
 
-async function tryNavigateToEventPage(page: any, url: string, eventDetails: CreateEventDto[], isWithinTwoWeeks: (dateText: string) => boolean, attempts = 3) {
+async function tryNavigateToEventPage(page: any, url: string, eventDetails: CreateEventDto[], attempts = 3) {
   for (let attempt = 1; attempt <= attempts; attempt++) {
     console.log(`Opening event page at ${url}, attempt ${attempt}`);
     try {
@@ -184,9 +174,7 @@ async function tryNavigateToEventPage(page: any, url: string, eventDetails: Crea
         return { title, date, description, time, venue, price, ticketLink, views, tags };
       });
 
-      if (details.date && isWithinTwoWeeks(details.date)) {
-        eventDetails.push(details);
-      }
+      eventDetails.push(details);
       break; 
     } catch (error) {
       console.error(`Timeout or navigation error on attempt ${attempt}:`, error);
